@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/userdb  # Use "postgres" como o host para o PostgreSQL no contêiner
+    driver-class-name: org.postgresql.Driver
+    username: admin
+    password: admin
+  jpa:
+    hibernate:
+      ddl-auto: update  # Cria ou atualiza as tabelas automaticamente
+    show-sql: true      # Exibe as queries SQL no console
+  security:
+    jwt:
+      secret: mysecretkey  # Chave secreta para autenticação JWT
