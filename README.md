@@ -46,6 +46,7 @@ mvn clean install -DskipTests
 Isso irá gerar o JAR do projeto na pasta target/ e pular os testes.
 
 5. Endpoints Disponíveis
+   
 5.1. Registro de Usuário
 Endpoint: /api/auth/register
 Método: POST
