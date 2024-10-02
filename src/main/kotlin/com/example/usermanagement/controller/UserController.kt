@@ -2,14 +2,14 @@ package com.example.usermanagement.controller
 
 import com.example.usermanagement.model.User
 import com.example.usermanagement.service.model.PaginatedResponseDTO
-import com.example.usermanagement.service.model.UserDTO
+import com.example.usermanagement.model.UserDTO
 import com.example.usermanagement.service.user.UserService
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/users")
 class UserController(private val userService: UserService) {
-    companion object{
+    companion object {
         const val DEFAULT_PAGE = "0"
         const val DEFAULT_PAGE_SIZE = "25"
     }
@@ -17,6 +17,11 @@ class UserController(private val userService: UserService) {
     @PutMapping("/{id}")
     fun updateUser(@PathVariable id: Long, @RequestBody newUser: User): User? {
         return userService.updateUser(id, newUser)
+    }
+
+    @DeleteMapping("/{id}")
+    fun deleteUser(@PathVariable id: Long): Boolean {
+        return userService.deleteUserById(id)
     }
 
     @GetMapping

@@ -1,4 +1,4 @@
-package com.example.usermanagement.service.model
+package com.example.usermanagement.model
 
 
 data class UserDTO(

@@ -3,8 +3,7 @@ package com.example.usermanagement.service.user
 import com.example.usermanagement.model.User
 import com.example.usermanagement.repository.UserRepository
 import com.example.usermanagement.service.model.PaginatedResponseDTO
-import com.example.usermanagement.service.model.UserDTO
-import org.springframework.data.domain.Page
+import com.example.usermanagement.model.UserDTO
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -35,7 +34,22 @@ class UserService(
         }
     }
 
-    fun listAllUsers(page: Int, size: Int): PaginatedResponseDTO<UserDTO> {val pageable: Pageable = PageRequest.of(page, size)
+    fun findByUsername(username: String): User? {
+        return userRepository.findByUsername(username)
+    }
+
+    fun deleteUserById(id: Long): Boolean {
+        val existingUser = userRepository.findById(id).orElse(null)
+        if (existingUser != null) {
+            userRepository.delete(existingUser)
+        } else {
+            return false
+        }
+        return true
+    }
+
+    fun listAllUsers(page: Int, size: Int): PaginatedResponseDTO<UserDTO> {
+        val pageable: Pageable = PageRequest.of(page, size)
         val usersPage = userRepository.findAll(pageable)
 
         val userDTOs = usersPage.content.map {
