@@ -2,7 +2,11 @@ package com.example.usermanagement.service.user
 
 import com.example.usermanagement.model.User
 import com.example.usermanagement.repository.UserRepository
+import com.example.usermanagement.service.model.PaginatedResponseDTO
 import com.example.usermanagement.service.model.UserDTO
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 
@@ -31,8 +35,10 @@ class UserService(
         }
     }
 
-    fun listAllUsers(): List<UserDTO> {
-        return userRepository.findAll().map {
+    fun listAllUsers(page: Int, size: Int): PaginatedResponseDTO<UserDTO> {val pageable: Pageable = PageRequest.of(page, size)
+        val usersPage = userRepository.findAll(pageable)
+
+        val userDTOs = usersPage.content.map {
             UserDTO(
                 id = it.id,
                 username = it.username,
@@ -40,5 +46,13 @@ class UserService(
                 role = it.role
             )
         }
+
+        return PaginatedResponseDTO(
+            page = usersPage.number,
+            pageSize = usersPage.size,
+            totalPages = usersPage.totalPages,
+            totalElements = usersPage.totalElements,
+            result = userDTOs
+        )
     }
 }
