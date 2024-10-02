@@ -2,6 +2,7 @@ package com.example.usermanagement.service.user
 
 import com.example.usermanagement.model.User
 import com.example.usermanagement.repository.UserRepository
+import com.example.usermanagement.service.model.UserDTO
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 
@@ -30,5 +31,14 @@ class UserService(
         }
     }
 
-    fun listAllUsers(): List<User> = userRepository.findAll()
+    fun listAllUsers(): List<UserDTO> {
+        return userRepository.findAll().map {
+            UserDTO(
+                id = it.id,
+                username = it.username,
+                email = it.email,
+                role = it.role
+            )
+        }
+    }
 }
