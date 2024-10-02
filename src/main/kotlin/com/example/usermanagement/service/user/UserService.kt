@@ -1,11 +1,13 @@
 package com.example.usermanagement.service.user
 
 import com.example.usermanagement.model.User
+import com.example.usermanagement.model.UserUpdateDTO
 import com.example.usermanagement.repository.UserRepository
 import com.example.usermanagement.service.model.PaginatedResponseDTO
 import com.example.usermanagement.model.UserDTO
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 
@@ -21,14 +23,16 @@ class UserService(
         return userRepository.save(newUser)
     }
 
-    fun updateUser(id: Long, newUser: User): User? {
+    fun updateUser(id: Long, newUserUpdateDTO: UserUpdateDTO): UserUpdateDTO? {
         val existingUser = userRepository.findById(id).orElse(null)
         return if (existingUser != null) {
             val updatedUser = existingUser.copy(
-                username = newUser.username,
-                email = newUser.email
+                username = newUserUpdateDTO.username,
+                email = newUserUpdateDTO.email
             )
-            userRepository.save(updatedUser)
+            userRepository.save(updatedUser).run {
+                UserUpdateDTO(username = this.username, email = this.email, role = this.role)
+            }
         } else {
             null
         }
@@ -36,6 +40,19 @@ class UserService(
 
     fun findByUsername(username: String): User? {
         return userRepository.findByUsername(username)
+    }
+
+    fun findUserDetailsById(id: Long): UserDetails {
+        val user: User = userRepository.findById(id).orElseThrow { RuntimeException("User not found") }
+        return org.springframework.security.core.userdetails.User(
+            user.username,
+            user.password,
+            emptyList()  // Carregar as autoridades do usuário, se necessário
+        )
+    }
+
+    fun findById(id: Long): User? {
+        return userRepository.findById(id).orElse(null)
     }
 
     fun deleteUserById(id: Long): Boolean {
