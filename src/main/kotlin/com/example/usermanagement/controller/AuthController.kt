@@ -1,7 +1,9 @@
 package com.example.usermanagement.controller
 
+import com.example.usermanagement.model.AuthResponseDTO
 import com.example.usermanagement.model.User
 import com.example.usermanagement.service.jwt.JwtService
+import com.example.usermanagement.model.UserDTO
 import com.example.usermanagement.service.user.UserService
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -27,12 +29,32 @@ class AuthController(
     }
 
     @PostMapping("/login")
-    fun login(@RequestBody authRequest: AuthRequest): String {
+    fun login(@RequestBody authRequest: AuthRequest): AuthResponseDTO {
+
+        // Autenticar o usuário
         authenticationManager.authenticate(
             UsernamePasswordAuthenticationToken(authRequest.username, authRequest.password)
         )
+
+        // Carregar os detalhes do usuário
         val userDetails: UserDetails = userDetailsService.loadUserByUsername(authRequest.username)
-        return jwtService.generateToken(userDetails.username)
+        val user = userService.findByUsername(authRequest.username)?.let {
+            UserDTO(
+                username = it.username,
+                email = it.email,
+                id = it.id,
+                role = it.role,
+
+            )
+        }
+
+        // Gerar o token JWT
+        val token = jwtService.generateToken(userDetails.username)
+
+        return AuthResponseDTO(
+            user!!,
+            token
+        )
     }
 }
 
