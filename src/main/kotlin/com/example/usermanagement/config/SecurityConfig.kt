@@ -4,7 +4,9 @@ import com.example.usermanagement.service.jwt.JwtFilter
 import com.example.usermanagement.service.user.UserDetailsService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Lazy
 import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -17,7 +19,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 class SecurityConfig(
-    private val jwtFilter: JwtFilter,
+    @Lazy private val jwtFilter: JwtFilter,
+    private val userDetailsService: UserDetailsService
 ) {
 
     @Bean
@@ -35,6 +38,10 @@ class SecurityConfig(
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter::class.java)
 
         return http.build()
+    }
+
+    fun configure(auth: AuthenticationManagerBuilder) {
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder())
     }
 
     @Bean

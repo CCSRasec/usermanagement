@@ -7,7 +7,6 @@ import com.example.usermanagement.model.UserDTO
 import com.example.usermanagement.service.user.UserService
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -37,7 +36,6 @@ class AuthController(
         )
 
         // Carregar os detalhes do usuário
-        val userDetails: UserDetails = userDetailsService.loadUserByUsername(authRequest.username)
         val user = userService.findByUsername(authRequest.username)?.let {
             UserDTO(
                 username = it.username,
@@ -45,15 +43,16 @@ class AuthController(
                 id = it.id,
                 role = it.role,
 
-            )
+                )
         }
 
-        // Gerar o token JWT
-        val token = jwtService.generateToken(userDetails.username)
+        // Gerar o token JWT com base no userId
+        val token = jwtService.generateToken(user!!.id)
 
+        // Retornar o token JWT junto com os dados do usuário
         return AuthResponseDTO(
-            user!!,
-            token
+            token = token,
+            user = user
         )
     }
 }
